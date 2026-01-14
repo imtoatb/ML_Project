@@ -41,7 +41,7 @@ def id_sopk_patients(X_train, X_test, y_train, y_test, feature_names):
     
     results = {}
     fig, axes = plt.subplots(2, 2, figsize=(15, 12))                                                    #4 graphs on the same page (2x2), size 15x12 inches
-    axes = axes.ravel()                                                                                 #2D -> 1D
+    axes = axes.ravel()                                                                                 #2D -> 1D for axis[i,j] -> axes[i]
     
 
 
@@ -92,7 +92,7 @@ def id_sopk_patients(X_train, X_test, y_train, y_test, feature_names):
         print(f"{name:<20} Accuracy: {accuracy:.6f}, AUC: {auc_roc:.6f}")
     
         
-        #cm = add_confusion_matrix_binary(y_test, y_pred, name)
+        cm = add_confusion_matrix_binary(y_test, y_pred, name)
     
     fig.tight_layout()
     plt.show()
@@ -105,14 +105,14 @@ def id_sopk_patients(X_train, X_test, y_train, y_test, feature_names):
     
 
 
-    if hasattr(best_result['model'], 'feature_importances_'):                                       #hasattr = verify model has attribute feature_importances_
+    if hasattr(best_result['model'], 'feature_importances_'):                                           #hasattr = verify model give importance to these features
         feature_importance = pd.DataFrame({'feature': feature_names,'importance': best_result['model'].feature_importances_}).sort_values('importance', ascending=False)
         
-        top_features = feature_importance.head(10)                                                  #To get the 10 best features
-        plt.barh(top_features['feature'], top_features['importance'])                               #horizontal bar diagram
+        top_features = feature_importance.head(10)                                                      #To get the 10 best features
+        plt.barh(top_features['feature'], top_features['importance'])                                   #horizontal bar diagram
         plt.xlabel('Importance')
         plt.title(f'10 Best Features of {best_model_name}')
-        plt.gca().invert_yaxis()                                                                    #Inversed y
+        plt.gca().invert_yaxis()                                                                        #Inversed y
         #plt.show()
     
     print("\n")
@@ -170,7 +170,7 @@ def visualize_subtype_distribution(df):
 def put_subtype_label(df):
     df_with_subtypes = create_pcos_subtype_labels(df)
     if df_with_subtypes is None:
-        return None, None, None                                                                 #return X, y, feature_name
+        return None, None, None                                                                         #return X, y, feature_name
     
     clinical_features = [
         'age', 'weight_kg', 'height_cm', 'bmi', 'testosterone', 'homa_ir', 
@@ -187,8 +187,8 @@ def put_subtype_label(df):
     y = df_with_subtypes['pcos_subtype']
     
    
-    label_encoder = LabelEncoder()                                                              #Transform Non,A,B,C,D en 0,1,2,3,4
-    y_encoded = label_encoder.fit_transform(y)                                                  #column with only nb to tell the subtype
+    label_encoder = LabelEncoder()                                                                      #Transform Non,A,B,C,D en 0,1,2,3,4
+    y_encoded = label_encoder.fit_transform(y)                                                          #column with only nb to tell the subtype
     
     return X, y_encoded, available_features, label_encoder
 
@@ -239,7 +239,7 @@ def compare_subtype_models(X_train, X_test, y_train, y_test):
 
 def create_test_patient(feature_names):
 
-    pcos_values = {
+    pcos_values = {                 #high values
         'testosterone': 65.0,
         'homa_ir': 3.2,
         'bmi': 28.5,
@@ -255,11 +255,11 @@ def create_test_patient(feature_names):
     }
 
     normal_values = {
-        'testosterone': 25.0,     # Normal: 15-45 ng/dL
-        'homa_ir': 1.2,           # Normal: <2.0
-        'bmi': 22.0,              # Normal: 18.5-24.9
-        'amh': 2.5,               # Normal pour âge: 1.0-4.0 ng/mL
-        'total_follicles': 10,    # Normal: 5-15
+        'testosterone': 25.0,     # Normal : 15-45 ng/dL
+        'homa_ir': 1.2,           #<2.0
+        'bmi': 22.0,              #18.5-24.9
+        'amh': 2.5,               #1.0-4.0 ng/mL
+        'total_follicles': 10,    
         'menstrual_regularity': 0,
         'age': 28,
         'weight_kg': 60,
@@ -269,7 +269,7 @@ def create_test_patient(feature_names):
         'acne_score': 0.3,        
     }
 
-    borderline_values = {
+    borderline_values = {               #Non pcos but close
         'testosterone': 48.0,     
         'homa_ir': 2.5,           
         'bmi': 26.0,              
@@ -284,7 +284,7 @@ def create_test_patient(feature_names):
         'acne_score': 1.0,            
     }
 
-    mild_pcos_values = {
+    mild_pcos_values = {          #Pcos type B
         'testosterone': 55.0,     
         'homa_ir': 3.0,           
         'bmi': 27.0,              
@@ -299,7 +299,7 @@ def create_test_patient(feature_names):
         'acne_score': 1.3,         
     }
 
-    mixed_values = {
+    mixed_values = {                #test
         'testosterone': 28.0,      
         'homa_ir': 1.5,  
         'bmi': 23.0,    
@@ -429,7 +429,7 @@ def add_confusion_matrix_subtype(y_true, y_pred, label_encoder, model_name):
 df = pd.read_csv('final_merged_dataset.csv')
 df_clean = medical_features(df)
 X_binary = df_clean.drop('pcos', axis=1)                                                    #got rid of the pcos column beacause = answer (axis 1 = column)
-y_binary = df_clean['pcos']                                                                 #put the pcos column here
+y_binary = df_clean['pcos']                                                                                     #put the pcos column here
 feature_names = X_binary.columns.tolist()                                                   #To get the columns's names
 X_train_bin, X_test_bin, y_train_bin, y_test_bin = train_test_split(X_binary, y_binary, test_size=0.2, random_state=42, stratify=y_binary)
 print(f"Train: {X_train_bin.shape}, Test: {X_test_bin.shape} \n")
@@ -446,9 +446,6 @@ print(f"AUC-ROC: {best_binary_result['auc_roc']:.3f}\n")
 patient_data = create_test_patient(feature_names)
 predict_binary_pcos(binary_results, best_binary_model, feature_names, patient_data)
 print("\n")
-
-
-
 
 
 
